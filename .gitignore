@@ -1,0 +1,69 @@
+# ============================================================
+#  .gitignore для проекта "igor"
+# ============================================================
+
+# ---------------- Python ----------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.pyo
+
+# Байткод и кэш mypy/ruff
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# ---------------- Виртуальные окружения ----------------
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# ---------------- Сборка / дистрибутивы ----------------
+build/
+dist/
+*.egg-info/
+*.egg
+wheels/
+pip-wheel-metadata/
+
+# ---------------- Инструменты / IDE ----------------
+# VS Code
+.vscode/
+# PyCharm / IntelliJ
+.idea/
+*.iml
+# Sublime / Vim / Emacs
+*.sublime-*
+*.swp
+*.swo
+*~
+# Jupyter (на будущее)
+.ipynb_checkpoints/
+
+# ---------------- ОС ----------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+# Linux
+*~
+.directory
+
+# ---------------- Переменные окружения / секреты ----------------
+.env
+.env.*
+!.env.example
+
+# ---------------- Логи и временные файлы ----------------
+*.log
+*.tmp
+*.bak
+*.orig
