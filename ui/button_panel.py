@@ -3,30 +3,37 @@
 import customtkinter as ctk
 
 from config import (
-    BUTTONS_LAYOUT,
     BUTTON_FONT,
     BUTTON_HEIGHT,
     BUTTON_WIDTH,
     CORNER_RADIUS,
     PADDING_INNER,
-    OPERATORS,
+    BINARY_OPERATORS,
+    UNARY_OPERATORS,
 )
 
-# Количество колонок в сетке кнопок
-COLUMNS = 4
-
-# Символы, относящиеся к «функциям»
-FUNC_BUTTONS = {"C", "⌫", "±", "%"}
+FUNC_BUTTONS = {"C", "⌫", "±", "%", "+%", "-%"}
 
 
 class ButtonPanel(ctk.CTkFrame):
-    """Сетка кнопок. Все нажатия пробрасывает через колбэк on_press."""
+    """Сетка кнопок. Пересобирается при смене режима."""
 
-    def __init__(self, master, on_press, theme):
+    def __init__(self, master, on_press, theme, layout, columns):
         super().__init__(master, corner_radius=CORNER_RADIUS)
         self.on_press = on_press
         self._theme = theme
-        self._buttons = []   # список (кнопка, категория)
+        self._layout = layout
+        self._columns = columns
+        self._buttons = []
+        self._build()
+
+    # ---------------- Пересборка ----------------
+    def set_layout(self, layout, columns):
+        for child in self.winfo_children():
+            child.destroy()
+        self._buttons.clear()
+        self._layout = layout
+        self._columns = columns
         self._build()
 
     # ---------------- Классификация ----------------
@@ -36,7 +43,7 @@ class ButtonPanel(ctk.CTkFrame):
             return "func"
         if text == "=":
             return "equal"
-        if text in OPERATORS:
+        if text in BINARY_OPERATORS or text in UNARY_OPERATORS:
             return "op"
         return "digit"
 
@@ -50,30 +57,28 @@ class ButtonPanel(ctk.CTkFrame):
             return t["op_bg"], t["op_hover"], t["op_fg"]
         return t["btn_bg"], t["btn_hover"], t["btn_fg"]
 
-    # ---------------- Построение сетки ----------------
+    # ---------------- Построение ----------------
     def _build(self):
         self.configure(fg_color=self._theme["frame_bg"])
 
-        for col in range(COLUMNS):
+        for col in range(self._columns):
             self.columnconfigure(col, weight=1)
 
-        for row_index, row in enumerate(BUTTONS_LAYOUT):
+        for row_index, row in enumerate(self._layout):
             self.rowconfigure(row_index, weight=1)
-
-            if len(row) == 1:
-                self._add_button(row[0], row_index, 0, span=COLUMNS)
-                continue
 
             col_index = 0
             for text in row:
-                if text == "0":
-                    self._add_button(text, row_index, col_index, span=2)
-                    col_index += 2
+                if text == "⌫":
+                    span = self._columns
+                elif text == "0" and self._columns == 4:
+                    span = 2
                 else:
-                    self._add_button(text, row_index, col_index)
-                    col_index += 1
+                    span = 1
 
-    # ---------------- Создание одной кнопки ----------------
+                self._add_button(text, row_index, col_index, span=span)
+                col_index += span
+
     def _add_button(self, text, row, column, span=1):
         category = self._classify(text)
         bg, hover, fg = self._colors_for(category)
